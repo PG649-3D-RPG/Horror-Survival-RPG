@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.pg649.creaturegenerator": {
+      "version": "https://github.com/PG649-3D-RPG/Creature-Generation.git?path=/Packages/com.pg649.creaturegenerator#dev",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "5198eff1e260b488253ac17166cbccf8b047e8e7"
+    },
     "com.unity.cinemachine": {
       "version": "2.8.9",
       "depth": 0,
