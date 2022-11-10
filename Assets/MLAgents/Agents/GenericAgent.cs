@@ -75,7 +75,7 @@ public abstract class GenericAgent : Agent
     {
         var parent = transform.parent;
         _agent = gameObject.GetComponent<Agent>();
-        _target = parent.Find("Creature Target").transform;
+        _target = GameObject.FindWithTag("target").transform;
         MTargetWalkingSpeed = _mlAgentsConfig.TargetWalkingSpeed;
         var oCube = transform.Find("Orientation Cube");
         _orientationCube = oCube.GetComponent<OrientationCubeController>();
