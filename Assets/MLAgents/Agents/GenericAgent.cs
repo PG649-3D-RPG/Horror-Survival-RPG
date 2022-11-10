@@ -145,21 +145,6 @@ public abstract class GenericAgent : Agent
         _topTransform.localRotation = Quaternion.Euler(rotation);
     }
 
-    /// <summary>
-    /// Is called on episode begin.
-    /// Loop over body parts and reset them to initial conditions.
-    /// Regenerate terrain and place target cube randomly 
-    /// </summary>
-    public override void OnEpisodeBegin()
-    {
-        _episodeCounter++;
-
-        SetWalkerOnGround();
-
-        //Set our goal walking speed
-        MTargetWalkingSpeed =
-            _mlAgentsConfig.RandomizeWalkSpeedEachEpisode ? Random.Range(0.1f, _mlAgentsConfig.MaxWalkingSpeed) : MTargetWalkingSpeed;
-    }
     
     protected Vector3 GetAvgVelocityOfCreature()
     {
