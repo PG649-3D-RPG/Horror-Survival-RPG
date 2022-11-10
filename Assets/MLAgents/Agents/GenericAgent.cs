@@ -26,9 +26,6 @@ public abstract class GenericAgent : Agent
 
 
     // Scripts
-    protected DynamicEnvironmentGenerator _deg;
-    protected TerrainGenerator _terrainGenerator;
-    protected WalkTargetScript _walkTargetScript;
     protected Transform _target;
     protected OrientationCubeController _orientationCube;
     protected JointDriveController _jdController;
@@ -43,7 +40,6 @@ public abstract class GenericAgent : Agent
     
     public void Awake()
     {
-        _deg = FindObjectOfType<DynamicEnvironmentGenerator>();
         if(GetComponent<JointDriveController>() != null) Destroy(GetComponent<DecisionRequester>());
         if (GetComponent<DecisionRequester>() != null) Destroy(GetComponent<JointDriveController>());
 
@@ -71,15 +67,13 @@ public abstract class GenericAgent : Agent
         var bpScript = GetComponent<BehaviorParameters>();
         bpScript.BrainParameters.ActionSpec = new ActionSpec(_mlAgentsConfig.ContinuousActionSpace, new int[_mlAgentsConfig.DiscreteBranches]);
         bpScript.BrainParameters.VectorObservationSize = _mlAgentsConfig.ObservationSpace;
-        bpScript.BehaviorName = DynamicEnvironmentGenerator.BehaviorName;
-        bpScript.Model = _deg.NnModel;
+        // TODO bpScript.BehaviorName = DynamicEnvironmentGenerator.BehaviorName;
+        // TODO bpScript.Model = _deg.NnModel;
     }
 
     public override void Initialize()
     {
         var parent = transform.parent;
-        _terrainGenerator = parent.GetComponentInChildren<TerrainGenerator>();
-        _walkTargetScript = parent.GetComponentInChildren<WalkTargetScript>();
         _agent = gameObject.GetComponent<Agent>();
         _target = parent.Find("Creature Target").transform;
         MTargetWalkingSpeed = _mlAgentsConfig.TargetWalkingSpeed;
@@ -124,9 +118,9 @@ public abstract class GenericAgent : Agent
     protected void SetWalkerOnGround()
     {
         var position = _topTransform.position;
-        var terrainHeight = _terrainGenerator.GetTerrainHeight(position);
+        var terrainHeight = 0; // TODO _terrainGenerator.GetTerrainHeight(position);
 
-        position = new Vector3(_topStartingPosition.x, terrainHeight + _otherBodyPartHeight + DynamicEnvironmentGenerator.YHeightOffset, _topStartingPosition.z);
+        position = new Vector3(_topStartingPosition.x, terrainHeight + _otherBodyPartHeight + 0, _topStartingPosition.z);
         _topTransform.position = position;
         _topTransform.localRotation = _topStartingRotation;
 
@@ -137,7 +131,7 @@ public abstract class GenericAgent : Agent
         //Reset all of the body parts
         foreach (var bodyPart in _jdController.bodyPartsDict.Values.AsParallel())
         {
-            bodyPart.Reset(bodyPart, terrainHeight, DynamicEnvironmentGenerator.YHeightOffset);
+            bodyPart.Reset(bodyPart, terrainHeight, 0);
         }
 
         var rotation = new Vector3(_topStartingRotation.eulerAngles.x, Random.Range(0.0f, 360.0f),
@@ -160,17 +154,6 @@ public abstract class GenericAgent : Agent
     {
         _episodeCounter++;
 
-        // Order is important. First regenerate terrain -> than place cube!
-        if (_arenaSettings.RegenerateTerrainAfterXEpisodes > 0 && _episodeCounter % _arenaSettings.RegenerateTerrainAfterXEpisodes == 0)
-        {
-            _terrainGenerator.RegenerateTerrain();
-        }
-
-        if (_arenaSettings.EpisodeCountToRandomizeTargetCubePosition > 0 && _episodeCounter % _arenaSettings.EpisodeCountToRandomizeTargetCubePosition == 0)
-        {
-            _walkTargetScript.PlaceTargetCubeRandomly();
-        }
-
         SetWalkerOnGround();
 
         //Set our goal walking speed
@@ -190,7 +173,6 @@ public abstract class GenericAgent : Agent
     public void TouchedTarget()
     {
         AddReward(1f);
-        _walkTargetScript.PlaceTargetCubeRandomly();
     }
 
     void Start()
