@@ -67,7 +67,7 @@ public abstract class GenericAgent : Agent
         var bpScript = GetComponent<BehaviorParameters>();
         bpScript.BrainParameters.ActionSpec = new ActionSpec(_mlAgentsConfig.ContinuousActionSpace, new int[_mlAgentsConfig.DiscreteBranches]);
         bpScript.BrainParameters.VectorObservationSize = _mlAgentsConfig.ObservationSpace;
-        // TODO bpScript.BehaviorName = DynamicEnvironmentGenerator.BehaviorName;
+        bpScript.BehaviorName = "Walker";
         // TODO bpScript.Model = _deg.NnModel;
     }
 
