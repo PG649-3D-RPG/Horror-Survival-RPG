@@ -62,7 +62,7 @@ public class AgentNew : GenericAgent
         sensor.AddObservation(Quaternion.FromToRotation(_topTransform.forward, cubeForward));
 
         //Position of target position relative to cube
-        sensor.AddObservation(_orientationCube.transform.InverseTransformPoint(_target.transform.position));
+        sensor.AddObservation(_orientationCube.transform.InverseTransformPoint(_nextWayPoint));
 
         foreach (var bodyPart in _jdController.bodyPartsList)
         {
@@ -92,8 +92,9 @@ public class AgentNew : GenericAgent
     public void FixedUpdate()
     {
         //Update OrientationCube and DirectionIndicator
-        _dirToWalk = _target.position - _topTransform.position;
-        _orientationCube.UpdateOrientation(_topTransform, _target);
+        _nextWayPoint = _creatureController.GetNextWayPoint(_nextWayPoint);
+        _dirToWalk = _nextWayPoint - _topTransform.position;
+        _orientationCube.UpdateOrientation(_topTransform.position, _nextWayPoint);
 
         var forwardDir = _creatureConfig.creatureType == CreatureType.Biped ? _topTransform.up : _topTransform.forward;
 
@@ -112,7 +113,7 @@ public class AgentNew : GenericAgent
         if (float.IsNaN(lookAtTargetReward) ||
             float.IsNaN(matchSpeedReward))  //throw new ArgumentException($"A reward is NaN. float.");
         {
-            Debug.LogError($"lookAtTargetReward {float.IsNaN(lookAtTargetReward)} or matchSpeedReward {float.IsNaN(matchSpeedReward)}");
+            //Debug.LogError($"lookAtTargetReward {float.IsNaN(lookAtTargetReward)} or matchSpeedReward {float.IsNaN(matchSpeedReward)}");
         }
         else
         {

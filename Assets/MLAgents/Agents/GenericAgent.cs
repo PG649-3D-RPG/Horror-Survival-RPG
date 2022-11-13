@@ -12,20 +12,20 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 public abstract class GenericAgent : Agent
-{
-    
+{   
     // Internal values
     protected float _otherBodyPartHeight = 1f;
     protected Vector3 _topStartingPosition;
     protected Quaternion _topStartingRotation;
     protected Transform _topTransform;
     protected Rigidbody _topTransformRb;
-
     protected long _episodeCounter = 0;
     protected Vector3 _dirToWalk = Vector3.right;
-
+    protected Vector3 _nextWayPoint;
+    public float MTargetWalkingSpeed {get; set;}
 
     // Scripts
+    public ICreatureController _creatureController;
     protected Transform _target;
     protected OrientationCubeController _orientationCube;
     protected JointDriveController _jdController;
@@ -34,8 +34,6 @@ public abstract class GenericAgent : Agent
     protected MlAgentConfig _mlAgentsConfig;
     protected ArenaConfig _arenaSettings;
     protected CreatureConfig _creatureConfig;
-
-    public float MTargetWalkingSpeed;
 
     
     public void Awake()
@@ -49,6 +47,7 @@ public abstract class GenericAgent : Agent
         _arenaSettings = FindObjectOfType<ArenaConfig>();
         _creatureConfig = FindObjectOfType<CreatureConfig>();
 
+        _creatureController = gameObject.GetComponent<ICreatureController>();
 
         // Config decision requester
         _decisionRequester.DecisionPeriod = _mlAgentsConfig.DecisionPeriod;
@@ -73,10 +72,9 @@ public abstract class GenericAgent : Agent
 
     public override void Initialize()
     {
-        var parent = transform.parent;
         _agent = gameObject.GetComponent<Agent>();
-        _target = GameObject.FindWithTag("target").transform;
-        MTargetWalkingSpeed = _mlAgentsConfig.TargetWalkingSpeed;
+        
+
         var oCube = transform.Find("Orientation Cube");
         _orientationCube = oCube.GetComponent<OrientationCubeController>();
         if(_orientationCube == null) _orientationCube = oCube.AddComponent<OrientationCubeController>();
@@ -108,6 +106,7 @@ public abstract class GenericAgent : Agent
             bodyPart.BodyPartHeight = trans.position.y - minYBodyPartCoordinate;
         }
 
+        _nextWayPoint = _topTransform.position;
         _otherBodyPartHeight = _topTransform.position.y - minYBodyPartCoordinate;
         SetWalkerOnGround();
     }

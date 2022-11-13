@@ -62,7 +62,7 @@ public class AgentGenTests : GenericAgent
         sensor.AddObservation(Quaternion.FromToRotation(_topTransform.forward, cubeForward));
 
         //Position of target position relative to cube
-        sensor.AddObservation(_orientationCube.transform.InverseTransformPoint(_target.transform.position));
+        sensor.AddObservation(_orientationCube.transform.InverseTransformPoint(_nextWayPoint));
 
         foreach (var bodyPart in _jdController.bodyPartsList)
         {
@@ -102,8 +102,9 @@ public class AgentGenTests : GenericAgent
     public void FixedUpdate()
     {
         //Update OrientationCube and DirectionIndicator
-        _dirToWalk = _target.position - _topTransform.position;
-        _orientationCube.UpdateOrientation(_topTransform, _target);
+        _nextWayPoint = _creatureController.GetNextWayPoint(_nextWayPoint);
+        _dirToWalk = _nextWayPoint - _topTransform.position;
+        _orientationCube.UpdateOrientation(_topTransform.position, _nextWayPoint);
 
         var cubeForward = _orientationCube.transform.forward;
 
