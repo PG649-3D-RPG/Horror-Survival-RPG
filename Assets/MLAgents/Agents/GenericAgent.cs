@@ -26,7 +26,6 @@ public abstract class GenericAgent : Agent
 
     // Scripts
     public ICreatureController _creatureController;
-    protected Transform _target;
     protected OrientationCubeController _orientationCube;
     protected JointDriveController _jdController;
     protected DecisionRequester _decisionRequester;
