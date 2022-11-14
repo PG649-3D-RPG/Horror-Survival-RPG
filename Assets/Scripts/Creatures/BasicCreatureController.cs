@@ -6,6 +6,8 @@ using UnityEngine.AI;
 
 public class BasicCreatureController : MonoBehaviour, ICreatureController
 {
+    [SerializeField]
+    private float _health = 100f;
     private GenericAgent _movementAgent;
     private NavMeshPath _path;
     private int _pathCornerIndex;
@@ -62,6 +64,15 @@ public class BasicCreatureController : MonoBehaviour, ICreatureController
     public float GetWalkingSpeed()
     {
         return _walkingSpeed;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        _health -= damage;
+        if(_health <= 0)
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     private IEnumerator ReCalculatePath()
