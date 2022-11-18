@@ -44,7 +44,7 @@ public class BasicCreatureController : MonoBehaviour, ICreatureController
     // Update is called once per frame
     void Update()
     {
-        
+        HandleMovementSpeed();
     }
 
     public Vector3 GetNextWayPoint(Vector3 oldWayPoint)
@@ -72,6 +72,18 @@ public class BasicCreatureController : MonoBehaviour, ICreatureController
         if(_health <= 0)
         {
             Destroy(this.gameObject);
+        }
+    }
+
+    private void HandleMovementSpeed()
+    {
+        if(Vector3.Distance(_target.position, _rootElementTransform.position) >= 10)
+        {
+            _movementAgent.MTargetWalkingSpeed = 5f;
+        }
+        else
+        {
+            _movementAgent.MTargetWalkingSpeed = 10f;
         }
     }
 
