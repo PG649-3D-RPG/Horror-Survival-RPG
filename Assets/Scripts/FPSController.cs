@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,7 +5,8 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerInputState))]
 public class FPSController : MonoBehaviour
 {
-    [Header("Player")] [Tooltip("Move speed of the character in m/s")]
+    [Header("Player")]
+    [Tooltip("Move speed of the character in m/s")]
     public float MoveSpeed = 4.0f;
 
     [Tooltip("Sprint speed of the character in m/s")]
@@ -19,13 +18,15 @@ public class FPSController : MonoBehaviour
     [Tooltip("Acceleration and deceleration")]
     public float SpeedChangeRate = 10.0f;
 
-    [Space(10)] [Tooltip("The height the player can jump")]
+    [Space(10)]
+    [Tooltip("The height the player can jump")]
     public float JumpHeight = 1.2f;
 
     [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
     public float Gravity = -15.0f;
 
-    [Space(10)] [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
+    [Space(10)]
+    [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
     public float JumpTimeout = 0.1f;
 
     [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
@@ -71,6 +72,9 @@ public class FPSController : MonoBehaviour
     private CharacterController _controller;
     private PlayerInputState _input;
     private GameObject _mainCamera;
+    private GameObject _terrain;
+
+    private bool setSpawnPos = false; //TODO WORK-IN-PROGRESS improve
 
     private const float Threshold = 0.01f;
 
@@ -98,6 +102,22 @@ public class FPSController : MonoBehaviour
 
     private void Update()
     {
+        // TODO WORK-IN-PROGRESS improve
+        if (!setSpawnPos)
+        {
+            // get a reference to the terrain for the spawn point
+            if (_terrain == null)
+            {
+                _terrain = GameObject.FindGameObjectWithTag("ground");
+            }
+            else
+            {
+                var playerSpawnPos = _terrain.GetComponent<MiscTerrainData>().SpawnPoints[0].Item1;
+                _controller.transform.position = playerSpawnPos;
+                setSpawnPos = true;
+                //Debug.Log("set pos");
+            }
+        }
         JumpAndGravity();
         GroundedCheck();
         Move();

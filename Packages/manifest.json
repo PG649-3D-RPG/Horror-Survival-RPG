@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.pg649.creaturegenerator": "https://github.com/PG649-3D-RPG/Creature-Generation.git?path=/Packages/com.pg649.creaturegenerator#dev",
+    "com.pg649.worldgeneration": "https://github.com/PG649-3D-RPG/World-Generation.git?path=/Packages/com.pg649.worldgeneration#main",
     "com.unity.cinemachine": "2.8.9",
     "com.unity.collab-proxy": "1.15.16",
     "com.unity.feature.development": "1.0.1",
@@ -12,6 +13,7 @@
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.6.4",
     "com.unity.toolchain.linux-x86_64": "2.0.2",
+    "com.unity.toolchain.win-x86_64-linux-x86_64": "2.0.3",
     "com.unity.ugui": "1.0.0",
     "com.unity.visualscripting": "1.7.6",
     "com.unity.modules.ai": "1.0.0",
