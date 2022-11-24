@@ -72,9 +72,6 @@ public class FPSController : MonoBehaviour
     private CharacterController _controller;
     private PlayerInputState _input;
     private GameObject _mainCamera;
-    private GameObject _terrain;
-
-    private bool setSpawnPos = false; //TODO WORK-IN-PROGRESS improve
 
     private const float Threshold = 0.01f;
 
@@ -102,22 +99,6 @@ public class FPSController : MonoBehaviour
 
     private void Update()
     {
-        // TODO WORK-IN-PROGRESS improve
-        if (!setSpawnPos)
-        {
-            // get a reference to the terrain for the spawn point
-            if (_terrain == null)
-            {
-                _terrain = GameObject.FindGameObjectWithTag("ground");
-            }
-            else
-            {
-                var playerSpawnPos = _terrain.GetComponent<MiscTerrainData>().SpawnPoints[0].Item1;
-                _controller.transform.position = playerSpawnPos;
-                setSpawnPos = true;
-                //Debug.Log("set pos");
-            }
-        }
         JumpAndGravity();
         GroundedCheck();
         Move();

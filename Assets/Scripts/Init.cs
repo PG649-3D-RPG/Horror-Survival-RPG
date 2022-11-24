@@ -1,4 +1,5 @@
 using System.Collections;
+using Cinemachine;
 using UnityEngine;
 
 public class Init : MonoBehaviour
@@ -18,6 +19,20 @@ public class Init : MonoBehaviour
     {
         GameObject terrain = WorldGenerator.Generate(WGSettings);
         GameObject c1 = CreatureGenerator.ParametricBiped(CGSettings, BipedSettings, null);
+        GameObject player = SetupPlayer(terrain);
         yield return null;
+    }
+    private GameObject SetupPlayer(GameObject terrain)
+    {
+        var playerPrefab = Resources.Load("Prefabs/Player") as GameObject;
+        var spawnPoint = terrain.GetComponent<MiscTerrainData>().SpawnPoints[0].Item1;
+        var spawnLifted = spawnPoint + new Vector3(0, 0.1f, 0);
+        var player = GameObject.Instantiate(playerPrefab, spawnLifted, transform.rotation);
+        // let fpscam follow player
+        var fpscam = GameObject.Find("FPSCam");
+        var playercam = player.transform.Find("PlayerCameraRoot");
+        // fpscam.GetComponent<CinemachineVirtualCamera>().LookAt = c.transform;
+        fpscam.GetComponent<CinemachineVirtualCamera>().Follow = playercam.transform;
+        return player;
     }
 }
