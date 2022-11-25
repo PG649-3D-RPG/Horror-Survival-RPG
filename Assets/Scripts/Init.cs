@@ -18,6 +18,7 @@ public class Init : MonoBehaviour
     private IEnumerator SetupLevel()
     {
         GameObject terrain = WorldGenerator.Generate(WGSettings);
+        terrain.layer = LayerMask.NameToLayer("Ground");
         GameObject c1 = CreatureGenerator.ParametricBiped(CGSettings, BipedSettings, null);
         GameObject player = SetupPlayer(terrain);
         yield return null;
