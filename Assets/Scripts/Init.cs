@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Cinemachine;
 using UnityEngine;
@@ -17,9 +18,12 @@ public class Init : MonoBehaviour
 
     private IEnumerator SetupLevel()
     {
+        var creatureFactory = FindObjectOfType<CreatureFactory>();
         GameObject terrain = WorldGenerator.Generate(WGSettings);
         terrain.layer = LayerMask.NameToLayer("Ground");
         GameObject c1 = CreatureGenerator.ParametricBiped(CGSettings, BipedSettings, null);
+        creatureFactory.AddPrototype(c1);
+        
         GameObject player = SetupPlayer(terrain);
         yield return null;
     }
