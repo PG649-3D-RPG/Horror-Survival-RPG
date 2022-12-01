@@ -65,3 +65,7 @@ crashlytics-build.properties
 *.png
 .vscode/
 .vsconfig
+
+# Ignore ML-Agents Timers
+/[Aa]ssets/ML-Agents/
+/[Aa]ssets/ML-Agents.meta
