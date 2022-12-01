@@ -18,7 +18,10 @@ public class Init : MonoBehaviour
 
     private IEnumerator SetupLevel()
     {
+        var creatureFactory = FindObjectOfType<CreatureFactory>();
         GameObject c1 = CreatureGenerator.ParametricBiped(CGSettings, BipedSettings, null);
+        creatureFactory.AddPrototype(c1);
+        
         yield return null;
     }
 }
