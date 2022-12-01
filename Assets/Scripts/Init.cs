@@ -18,11 +18,14 @@ public class Init : MonoBehaviour
 
     private IEnumerator SetupLevel()
     {
-        var creatureFactory = FindObjectOfType<CreatureFactory>();
         GameObject terrain = WorldGenerator.Generate(WGSettings);
         terrain.layer = LayerMask.NameToLayer("Ground");
+        yield return null;
+        
+        var creatureFactory = FindObjectOfType<CreatureFactory>();
         GameObject c1 = CreatureGenerator.ParametricBiped(CGSettings, BipedSettings, null);
         creatureFactory.AddPrototype(c1);
+        yield return null;
         
         GameObject player = SetupPlayer(terrain);
         yield return null;
