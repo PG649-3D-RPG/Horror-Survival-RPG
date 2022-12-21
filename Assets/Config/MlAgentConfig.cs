@@ -16,6 +16,8 @@ namespace Config
         [Header("Learning Settings")]
         [Space(10)]
         [SerializeField]
+        public bool CalculateActionSpace = false;
+        [SerializeField]
         public int ContinuousActionSpace = 100;
         [SerializeField]
         public int DiscreteBranches = 0;
@@ -26,7 +28,7 @@ namespace Config
         [SerializeField]
         public bool TakeActionsBetweenDecisions = false;
         [SerializeField]
-        public int DecisionPeriod = 0;
+        public int DecisionPeriod = 5;
         [Header("Joint Settings")]
         [Space(10)]
         [SerializeField]

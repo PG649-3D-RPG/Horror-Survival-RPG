@@ -12,20 +12,22 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 public abstract class GenericAgent : Agent
-{   
+{
+    private const string BehaviorName = "Walker";
+
     // Internal values
     protected float _otherBodyPartHeight = 1f;
     protected Vector3 _topStartingPosition;
     protected Quaternion _topStartingRotation;
     protected Transform _topTransform;
     protected Rigidbody _topTransformRb;
-    protected long _episodeCounter = 0;
-    protected Vector3 _dirToWalk = Vector3.right;
-    protected Vector3 _nextWayPoint;
-    public float MTargetWalkingSpeed {get; set;}
+    protected Vector3 _initialCenterOfMass;
+    protected float _creatureHeight;
 
     // Scripts
-    public ICreatureController _creatureController;
+    protected Terrain _terrain;
+    //protected WalkTargetScript _walkTargetScript;
+    protected Transform _target;
     protected OrientationCubeController _orientationCube;
     protected JointDriveController _jdController;
     protected DecisionRequester _decisionRequester;
@@ -34,7 +36,9 @@ public abstract class GenericAgent : Agent
     protected ArenaConfig _arenaSettings;
     protected CreatureConfig _creatureConfig;
 
-    
+    public float MTargetWalkingSpeed;
+    public const float YHeightOffset = 0.1f;
+
     public void Awake()
     {
         if(GetComponent<JointDriveController>() != null) Destroy(GetComponent<DecisionRequester>());
@@ -45,8 +49,6 @@ public abstract class GenericAgent : Agent
         _mlAgentsConfig = FindObjectOfType<MlAgentConfig>();
         _arenaSettings = FindObjectOfType<ArenaConfig>();
         _creatureConfig = FindObjectOfType<CreatureConfig>();
-
-        _creatureController = gameObject.GetComponent<ICreatureController>();
 
         // Config decision requester
         _decisionRequester.DecisionPeriod = _mlAgentsConfig.DecisionPeriod;
@@ -61,64 +63,38 @@ public abstract class GenericAgent : Agent
         var mAgent = gameObject.GetComponent<Agent>();
         mAgent.MaxStep = _mlAgentsConfig.MaxStep;
 
-        // Set behavior parameters
-        var bpScript = GetComponent<BehaviorParameters>();
-        bpScript.BrainParameters.ActionSpec = new ActionSpec(_mlAgentsConfig.ContinuousActionSpace, new int[_mlAgentsConfig.DiscreteBranches]);
-        bpScript.BrainParameters.VectorObservationSize = _mlAgentsConfig.ObservationSpace;
-        bpScript.BehaviorName = "Walker";
-        // TODO bpScript.Model = _deg.NnModel;
+        SetUpBodyParts();
+        
+        InitializeBehaviorParameters();
     }
+
+    protected abstract int CalculateNumberContinuousActions();
+    protected abstract int CalculateNumberDiscreteBranches();
 
     public override void Initialize()
     {
+        _terrain = FindObjectOfType<Terrain>();
+        var parent = transform.parent;
+        //_walkTargetScript = parent.GetComponentInChildren<WalkTargetScript>();
         _agent = gameObject.GetComponent<Agent>();
-        
-
+        _target = GameObject.Find("Player").transform;
+        MTargetWalkingSpeed = _mlAgentsConfig.TargetWalkingSpeed;
         var oCube = transform.Find("Orientation Cube");
         _orientationCube = oCube.GetComponent<OrientationCubeController>();
         if(_orientationCube == null) _orientationCube = oCube.AddComponent<OrientationCubeController>();
-
-        //Get Body Parts
-        //and setup each body part
-        var minYBodyPartCoordinate = 0f;
-        foreach (var bone in GetComponentsInChildren<Bone>())
-        {
-            if (!bone.isRoot)
-            {
-                if (bone.transform.GetComponent<GroundContact>() == null) bone.transform.AddComponent<GroundContact>();
-                _jdController.SetupBodyPart(bone.transform);
-
-            }
-            else
-            {
-                _topTransform = bone.transform;
-                _topTransformRb = bone.transform.GetComponent<Rigidbody>();
-
-                _topStartingRotation = bone.transform.localRotation;
-                _topStartingPosition = bone.transform.position;
-            }
-            minYBodyPartCoordinate = Math.Min(minYBodyPartCoordinate, bone.transform.position.y);
-        }
-
-        foreach(var (trans, bodyPart) in _jdController.bodyPartsDict)
-        {
-            bodyPart.BodyPartHeight = trans.position.y - minYBodyPartCoordinate;
-        }
-
-        _nextWayPoint = _topTransform.position;
-        _otherBodyPartHeight = _topTransform.position.y - minYBodyPartCoordinate;
+        
         SetWalkerOnGround();
     }
-    
+
     /// <summary>
     /// Set the walker on the terrain.
     /// </summary>
     protected void SetWalkerOnGround()
     {
         var position = _topTransform.position;
-        var terrainHeight = 0; // TODO _terrainGenerator.GetTerrainHeight(position);
+        var terrainHeight = _terrain.GetComponent<Terrain>().SampleHeight(position);
 
-        position = new Vector3(_topStartingPosition.x, terrainHeight + _otherBodyPartHeight + 0, _topStartingPosition.z);
+        position = new Vector3(_topStartingPosition.x, terrainHeight + _otherBodyPartHeight + YHeightOffset, _topStartingPosition.z);
         _topTransform.position = position;
         _topTransform.localRotation = _topStartingRotation;
 
@@ -129,7 +105,7 @@ public abstract class GenericAgent : Agent
         //Reset all of the body parts
         foreach (var bodyPart in _jdController.bodyPartsDict.Values.AsParallel())
         {
-            bodyPart.Reset(bodyPart, terrainHeight, 0);
+            bodyPart.Reset(bodyPart, terrainHeight, YHeightOffset);
         }
 
         var rotation = new Vector3(_topStartingRotation.eulerAngles.x, Random.Range(0.0f, 360.0f),
@@ -143,6 +119,19 @@ public abstract class GenericAgent : Agent
         _topTransform.localRotation = Quaternion.Euler(rotation);
     }
 
+    /// <summary>
+    /// Is called on episode begin.
+    /// Loop over body parts and reset them to initial conditions.
+    /// Regenerate terrain and place target cube randomly 
+    /// </summary>
+    public override void OnEpisodeBegin()
+    {
+        SetWalkerOnGround();
+
+        //Set our goal walking speed
+        MTargetWalkingSpeed =
+            _mlAgentsConfig.RandomizeWalkSpeedEachEpisode ? Random.Range(0.1f, _mlAgentsConfig.MaxWalkingSpeed) : MTargetWalkingSpeed;
+    }
     
     protected Vector3 GetAvgVelocityOfCreature()
     {
@@ -161,9 +150,80 @@ public abstract class GenericAgent : Agent
     void Start()
     {
         _ = StartCoroutine(nameof(CheckWalkerOutOfArea));
+        CalculateInitialValues();
     }
 
+    private void CalculateInitialValues()
+    {
+        _initialCenterOfMass = CalculateCenterOfMass(_topTransform, out var _);
+        
+        Rigidbody minx, maxx, miny, maxy, minz, maxz; 
+        minx = maxx = miny = maxy = minz = maxz = _topTransform.GetComponentInChildren<Rigidbody>();
+        
+        foreach (var rb in _topTransform.GetComponentsInChildren<Rigidbody>())
+        {
+            if (rb.transform.position.x <= minx.position.x)
+            {
+                minx = rb;
+            }
+            if (rb.transform.position.x >= maxx.position.x)
+            {
+                maxx = rb;
+            }
+            
+            if (rb.transform.position.y <= miny.position.y)
+            {
+                miny = rb;
+            }
+            if (rb.transform.position.y >= maxy.position.y)
+            {
+                maxy = rb;
+            }
+            
+            if (rb.transform.position.z <= minz.position.z)
+            {
+                minz = rb;
+            }
+            if (rb.transform.position.z >= maxz.position.z)
+            {
+                maxz = rb;
+            }
+        }
 
+        // This seems to only work for the height. 
+        //var width = maxx.transform.GetComponent<Collider>().bounds.max.x -
+        //            minx.transform.GetComponent<Collider>().bounds.min.x;
+        _creatureHeight = maxy.transform.GetComponent<Collider>().bounds.max.y -
+                     miny.transform.GetComponent<Collider>().bounds.min.y;
+        //var depth = maxz.transform.GetComponent<Collider>().bounds.max.z -
+        //            minz.transform.GetComponent<Collider>().bounds.min.z;
+    }
+
+    protected Vector3 CalculateCenterOfMass(Transform topTransform, out Vector3 abs)
+    {   
+        var absCoM = Vector3.zero;
+        var relativeCoM = Vector3.zero;
+        var c = 0f;
+        
+        if (topTransform is not null)
+        {
+            foreach (var element in topTransform.GetComponentsInChildren<Rigidbody>())
+            {
+                float mass;
+                absCoM += element.worldCenterOfMass * (mass = element.mass);
+                c += mass;
+            }
+
+            absCoM /= c;
+            // This might be a little bit off. Someone might improve it.
+            relativeCoM = absCoM - topTransform.transform.position;
+        }
+        abs = absCoM;
+
+        return relativeCoM;
+    }
+    
+    
     private IEnumerator CheckWalkerOutOfArea()
     {
         while (true)
@@ -174,5 +234,55 @@ public abstract class GenericAgent : Agent
             }
             yield return new WaitForFixedUpdate();
         }
+    }
+
+    private void InitializeBehaviorParameters()
+    {
+        // Set behavior parameters
+        var bpScript = GetComponent<BehaviorParameters>();
+        bpScript.BrainParameters.VectorObservationSize = _mlAgentsConfig.ObservationSpace;
+        bpScript.BehaviorName = BehaviorName;
+        // TODO: How to implement?
+        //bpScript.Model = _deg.NnModel;
+
+        if(_mlAgentsConfig.CalculateActionSpace)
+        {
+            bpScript.BrainParameters.ActionSpec = new ActionSpec(CalculateNumberContinuousActions(), new int[CalculateNumberDiscreteBranches()]);
+        }
+        else
+        {
+            bpScript.BrainParameters.ActionSpec = new ActionSpec(_mlAgentsConfig.ContinuousActionSpace, new int[_mlAgentsConfig.DiscreteBranches]);
+        }
+    }
+
+    private void SetUpBodyParts()
+    {
+        //Get Body Parts
+        //and setup each body part
+        var minYBodyPartCoordinate = 0f;
+        foreach (var bone in GetComponentsInChildren<Bone>())
+        {
+            if (!bone.isRoot)
+            {
+                if (bone.transform.GetComponent<GroundContact>() == null) bone.transform.AddComponent<GroundContact>();
+                _jdController.SetupBodyPart(bone.transform);
+            }
+            else
+            {
+                _topTransform = bone.transform;
+                _topTransformRb = bone.transform.GetComponent<Rigidbody>();
+
+                _topStartingRotation = bone.transform.localRotation;
+                _topStartingPosition = bone.transform.position;
+            }
+            minYBodyPartCoordinate = Math.Min(minYBodyPartCoordinate, bone.transform.position.y);
+        }
+
+        foreach(var (trans, bodyPart) in _jdController.bodyPartsDict)
+        {
+            bodyPart.BodyPartHeight = trans.position.y - minYBodyPartCoordinate;
+        }
+
+        _otherBodyPartHeight = _topTransform.position.y - minYBodyPartCoordinate;
     }
 }

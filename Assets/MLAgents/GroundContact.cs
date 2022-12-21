@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Unity.MLAgents;
 
@@ -41,12 +40,7 @@ namespace Unity.MLAgentsExamples
         /// </summary>
         private void OnCollisionEnter(Collision col)
         {
-            if (col.transform.CompareTag(GroundTag))
-            {
-                TouchingGround = true;
-                if (_creatureConfig.PenaltiesForBodyParts.TryGetValue(_boneScript.category, out var groundContactPenalty)) Agent.SetReward(groundContactPenalty);
-                if (_creatureConfig.ResetOnGroundContactParts.Contains(_boneScript.category)) Agent.EndEpisode();
-            }
+            
         }
 
         /// <summary>

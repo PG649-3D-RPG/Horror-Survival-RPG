@@ -1,21 +1,38 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using Config;
-using JetBrains.Annotations;
 using UnityEngine;
-using Unity.MLAgents;
+using UnityEngine.AI;
 using Unity.MLAgents.Actuators;
-using Unity.MLAgents.Policies;
-using Unity.MLAgentsExamples;
 using Unity.MLAgents.Sensors;
-using Unity.VisualScripting;
 using BodyPart = Unity.MLAgentsExamples.BodyPart;
-using Random = UnityEngine.Random;
 
-public class AgentNew : GenericAgent
+public class AgentNavMesh : GenericAgent
 {
+    
+    private NavMeshPath _path;
+    private int _pathCornerIndex;
+    private float _timeElapsed;
+    private Vector3 _nextPathPoint;
+
+    //private GameObject targetBall;
+
+    protected override int CalculateNumberContinuousActions()
+    {
+        return _jdController.bodyPartsList.Sum(bodyPart => 1 + bodyPart.GetNumberUnlockedAngularMotions());
+    }
+
+    protected override int CalculateNumberDiscreteBranches()
+    {
+        return 0;
+    }
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        _path = new NavMeshPath();
+        _timeElapsed = 1f;
+        _nextPathPoint = _topTransform.position;
+    }
     /// <summary>
     /// Add relevant information on each body part to observations.
     /// </summary>
@@ -62,7 +79,7 @@ public class AgentNew : GenericAgent
         sensor.AddObservation(Quaternion.FromToRotation(_topTransform.forward, cubeForward));
 
         //Position of target position relative to cube
-        sensor.AddObservation(_orientationCube.transform.InverseTransformPoint(_nextWayPoint));
+        sensor.AddObservation(_orientationCube.transform.InverseTransformPoint(_nextPathPoint));
 
         foreach (var bodyPart in _jdController.bodyPartsList)
         {
@@ -91,14 +108,14 @@ public class AgentNew : GenericAgent
 
     public void FixedUpdate()
     {
+        _timeElapsed += Time.deltaTime;
+        _nextPathPoint = GetNextPathPoint(_nextPathPoint);
+        
         //Update OrientationCube and DirectionIndicator
-        _nextWayPoint = _creatureController.GetNextWayPoint(_nextWayPoint);
-        _dirToWalk = _nextWayPoint - _topTransform.position;
-        _orientationCube.UpdateOrientation(_topTransform.position, _nextWayPoint);
-
-        var forwardDir = _creatureConfig.creatureType == CreatureType.Biped ? _topTransform.up : _topTransform.forward;
-
+        var position = _topTransform.position;
+        _orientationCube.UpdateOrientation(position, _nextPathPoint);
         var cubeForward = _orientationCube.transform.forward;
+        var forwardDir = _creatureConfig.creatureType == CreatureType.Biped ? _topTransform.up : _topTransform.forward;
 
         // Set reward for this step according to mixture of the following elements.
         // a. Match target speed
@@ -111,14 +128,39 @@ public class AgentNew : GenericAgent
         var lookAtTargetReward = (Vector3.Dot(cubeForward, forwardDir) + 1) * 0.5f;
 
         if (float.IsNaN(lookAtTargetReward) ||
-            float.IsNaN(matchSpeedReward))  //throw new ArgumentException($"A reward is NaN. float.");
+            float.IsNaN(matchSpeedReward)) 
         {
-            //Debug.LogError($"lookAtTargetReward {float.IsNaN(lookAtTargetReward)} or matchSpeedReward {float.IsNaN(matchSpeedReward)}");
+            Debug.LogError($"lookAtTargetReward {float.IsNaN(lookAtTargetReward)} or matchSpeedReward {float.IsNaN(matchSpeedReward)}");
         }
         else
         {
-            AddReward(Math.Max(matchSpeedReward, 0.1f) * Math.Max(lookAtTargetReward, 0.1f));
+            AddReward(matchSpeedReward * lookAtTargetReward);
         }
     }
     
+    private Vector3 GetNextPathPoint(Vector3 nextPoint)
+    {
+        if(_timeElapsed >= 1.0f || _path.status == NavMeshPathStatus.PathInvalid)
+        {   
+            _timeElapsed = 0;
+            var oldPath = _path;
+            var pathValid = NavMesh.CalculatePath(_topTransform.position, _target.position, NavMesh.AllAreas, _path);
+            if (!pathValid)
+            {
+                _path = oldPath;
+                //Debug.Log($"Path invalid for {gameObject.name}");
+                return nextPoint;
+            }
+            else
+            {
+                _pathCornerIndex = 1;
+            }
+        }
+        if(_pathCornerIndex < _path.corners.Length - 1 && Vector3.Distance(_topTransform.position, _path.corners[_pathCornerIndex]) < 4f)
+        {
+            //Debug.Log("Increased path corner index");
+            _pathCornerIndex++;
+        }
+        return _path.corners[_pathCornerIndex] + new Vector3(0, 2 * _topStartingPosition.y, 0);
+    }
 }

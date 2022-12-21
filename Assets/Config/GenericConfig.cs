@@ -9,6 +9,20 @@ namespace Config
     {
         private string configPath => Application.streamingAssetsPath + "/" + GetType().Name + ".json";
         
+        public void Awake()
+        {
+            if (!Application.isEditor)
+            {
+                
+                LoadFromJson();
+            }
+            else
+            {
+                SaveObject();
+            }
+            ExecuteAtLoad();
+        }
+
         protected abstract void ExecuteAtLoad();
         
         private void LoadFromJson()

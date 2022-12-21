@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72dfee221b2e4f3f900e270fbf6e0dfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AgentScriptName: AgentNew
+  AgentScriptName: AgentNavMesh
 --- !u!4 &196126607
 Transform:
   m_ObjectHideFlags: 0
@@ -186,6 +186,7 @@ MonoBehaviour:
   RandomizeWalkSpeedEachEpisode: 0
   MaxWalkingSpeed: 10
   TargetWalkingSpeed: 5
+  CalculateActionSpace: 0
   ContinuousActionSpace: 61
   DiscreteBranches: 0
   MaxStep: 5000
@@ -428,7 +429,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1082290225
 GameObject:
@@ -685,7 +686,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1551010227
 MonoBehaviour:
@@ -727,6 +728,10 @@ PrefabInstance:
     - target: {fileID: 3573257850479429241, guid: 19f10c5f8c82bef4c9b57b66903d1704, type: 3}
       propertyPath: m_Name
       value: 4B_Creature_Dog2V2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3573257850479429241, guid: 19f10c5f8c82bef4c9b57b66903d1704, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4277519799146747152, guid: 19f10c5f8c82bef4c9b57b66903d1704, type: 3}
       propertyPath: m_RootOrder
