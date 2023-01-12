@@ -91,6 +91,7 @@ public class AgentNew : GenericAgent
 
     public void FixedUpdate()
     {
+        if (_creatureController == null) return;
         //Update OrientationCube and DirectionIndicator
         _nextWayPoint = _creatureController.GetNextWayPoint(_nextWayPoint);
         _dirToWalk = _nextWayPoint - _topTransform.position;
