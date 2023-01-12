@@ -11,6 +11,7 @@ public class PlayerInputState : MonoBehaviour
 	public Vector2 Look;
 	public bool Jump;
 	public bool Sprint;
+	public bool PrimaryAction;
 
 	[Header("Movement Settings")]
 	public bool AnalogMovement;
@@ -40,6 +41,11 @@ public class PlayerInputState : MonoBehaviour
 	public void OnSprint(InputValue value)
 	{
 		Sprint = value.isPressed;
+	}
+
+	public void OnPrimaryAction(InputValue value)
+	{
+		PrimaryAction = value.isPressed;
 	}
 
 	private void OnApplicationFocus(bool hasFocus)

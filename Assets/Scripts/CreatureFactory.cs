@@ -1,11 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using Unity.MLAgentsExamples;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CreatureFactory : MonoBehaviour
 {
 
     public string AgentScriptName = "AgentNew";
+    private static readonly Vector3 StoragePosition = new(10000.0f, 0.0f, 0.0f);
+    private static readonly Vector3 StorageOffset = new(1000.0f, 0.0f, 0.0f);
+
+    private List<GameObject> Prototypes = new();
+
     public void AddPrototype(GameObject root)
     {
         if (root.transform.Find("Orientation Cube") == null)
@@ -28,7 +35,33 @@ public class CreatureFactory : MonoBehaviour
             root.AddComponent<ModelOverrider>();
         }
         
-        // TODO(markus): Place somewhere it cant be seen
-        // TODO(markus): Add to some type of datastructure to keep track of creatures
-    } 
+        SetKinematic(root, true);
+
+        var index = Prototypes.Count;
+        Prototypes.Add(root);
+
+        root.transform.position = StoragePosition + index * StorageOffset;
+    }
+
+    public Func<GameObject> FactoryFor(int index)
+    {
+        return () =>
+        {
+            var result = GameObject.Instantiate(Prototypes[index]);
+            var controller = result.AddComponent<BasicCreatureController>();
+            result.GetComponent<AgentNew>()._creatureController = controller;
+            SetKinematic(result, false);
+            return result;
+        };
+    }
+
+    private void SetKinematic(GameObject root, bool kinematic)
+    {
+        var skeleton = root.GetComponentInChildren<Skeleton>();
+
+        foreach (var (_, _, rb, _) in skeleton.Iterator())
+        {
+            rb.isKinematic = kinematic;
+        }
+    }
 }

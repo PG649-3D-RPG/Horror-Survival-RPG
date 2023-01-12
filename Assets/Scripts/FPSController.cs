@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -54,6 +55,7 @@ public class FPSController : MonoBehaviour
     [Tooltip("How far in degrees can you move the camera down")]
     public float BottomClamp = -90.0f;
 
+    public GameObject Flashlight;
     // cinemachine
     private float _cinemachineTargetPitch;
 
@@ -102,11 +104,24 @@ public class FPSController : MonoBehaviour
         JumpAndGravity();
         GroundedCheck();
         Move();
+        UseItems();
     }
-
+    
     private void LateUpdate()
     {
         CameraRotation();
+    }
+
+    private void UseItems()
+    {
+        if (_input.PrimaryAction)
+        {
+            Flashlight.GetComponent<Flashlight>().Toggle();
+        }
+
+        // I have not found a way to make Unity do this automatically.
+        // The Jump input is reset manually in the Jump and Gravity code as well
+        _input.PrimaryAction = false;
     }
 
     private void GroundedCheck()

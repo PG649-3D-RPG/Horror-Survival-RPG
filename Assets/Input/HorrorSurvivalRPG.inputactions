@@ -24,7 +24,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Fire",
+                    "name": "PrimaryAction",
                     "type": "Button",
                     "id": "b38df973-cf89-4687-bf6e-6a9a30c68922",
                     "expectedControlType": "Button",
@@ -224,7 +224,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "Fire",
+                    "action": "PrimaryAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -235,7 +235,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Fire",
+                    "action": "PrimaryAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -246,7 +246,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Touch",
-                    "action": "Fire",
+                    "action": "PrimaryAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -257,7 +257,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Joystick",
-                    "action": "Fire",
+                    "action": "PrimaryAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -268,7 +268,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "Fire",
+                    "action": "PrimaryAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

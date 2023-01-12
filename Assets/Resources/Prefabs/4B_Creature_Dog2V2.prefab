@@ -1702,7 +1702,6 @@ GameObject:
   - component: {fileID: 5518467517843237429}
   - component: {fileID: -8992786609952385756}
   - component: {fileID: -227189568456816316}
-  - component: {fileID: 1525695857187087883}
   m_Layer: 0
   m_Name: 4B_Creature_Dog2V2
   m_TagString: Untagged
@@ -1786,19 +1785,6 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
---- !u!114 &1525695857187087883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3573257850479429241}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf05c61639093a645ad6a9ccd3043cd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _health: 100
 --- !u!1 &3801867892595453853
 GameObject:
   m_ObjectHideFlags: 0
