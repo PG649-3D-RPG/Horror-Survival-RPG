@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using DefaultNamespace;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -55,7 +57,11 @@ public class FPSController : MonoBehaviour
     [Tooltip("How far in degrees can you move the camera down")]
     public float BottomClamp = -90.0f;
 
-    public GameObject Flashlight;
+    public List<GameObject> EquipmentPrefabs;
+    private List<GameObject> Inventory = new();
+    public GameObject EquipmentRoot;
+    
+    private IEquipment Equipment;
     // cinemachine
     private float _cinemachineTargetPitch;
 
@@ -97,6 +103,17 @@ public class FPSController : MonoBehaviour
         // reset our timeouts on start
         _jumpTimeoutDelta = JumpTimeout;
         _fallTimeoutDelta = FallTimeout;
+
+        foreach (var prefab in EquipmentPrefabs) {
+            var equipment = Instantiate(prefab, EquipmentRoot.transform, false);
+            equipment.SetActive(false);
+            Inventory.Add(equipment);
+        }
+
+        if (Inventory.Count > 0)
+        {
+            Equip(Inventory[0]);
+        }
     }
 
     private void Update()
@@ -104,7 +121,7 @@ public class FPSController : MonoBehaviour
         JumpAndGravity();
         GroundedCheck();
         Move();
-        UseItems();
+        UseEquipment();
     }
     
     private void LateUpdate()
@@ -112,16 +129,42 @@ public class FPSController : MonoBehaviour
         CameraRotation();
     }
 
-    private void UseItems()
+    private void Equip(GameObject equipment)
+    {
+        var e = equipment.GetComponent<IEquipment>();
+        if (e == null) return;
+       
+        e.OnEquip();
+        Equipment?.OnUnequip();
+        Equipment = e;
+        equipment.transform.position = EquipmentRoot.transform.position;
+    }
+
+    private void UseEquipment()
     {
         if (_input.PrimaryAction)
         {
-            Flashlight.GetComponent<Flashlight>().Toggle();
+            Equipment.OnPrimary();
+        }
+        if (_input.SecondaryAction)
+        {
+            Equipment.OnSecondary();
         }
 
+        if (Inventory.Count > 0 && Keyboard.current.digit1Key.wasPressedThisFrame)
+        {
+            Equip(Inventory[0]);
+        }
+        
+        if (Inventory.Count > 1 && Keyboard.current.digit2Key.wasPressedThisFrame)
+        {
+            Equip(Inventory[1]);
+        }
+        
         // I have not found a way to make Unity do this automatically.
         // The Jump input is reset manually in the Jump and Gravity code as well
         _input.PrimaryAction = false;
+        _input.SecondaryAction = false;
     }
 
     private void GroundedCheck()

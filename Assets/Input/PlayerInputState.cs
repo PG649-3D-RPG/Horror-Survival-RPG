@@ -12,6 +12,7 @@ public class PlayerInputState : MonoBehaviour
 	public bool Jump;
 	public bool Sprint;
 	public bool PrimaryAction;
+	public bool SecondaryAction;
 
 	[Header("Movement Settings")]
 	public bool AnalogMovement;
@@ -46,6 +47,11 @@ public class PlayerInputState : MonoBehaviour
 	public void OnPrimaryAction(InputValue value)
 	{
 		PrimaryAction = value.isPressed;
+	}
+
+	public void OnSecondaryAction(InputValue value)
+	{
+		SecondaryAction = value.isPressed;
 	}
 
 	private void OnApplicationFocus(bool hasFocus)
