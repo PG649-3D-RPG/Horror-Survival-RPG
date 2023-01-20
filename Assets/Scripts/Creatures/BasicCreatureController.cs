@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Config;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -12,10 +13,16 @@ public class BasicCreatureController : MonoBehaviour, ICreatureController
     private NavMeshPath _path;
     private int _pathCornerIndex;
     private Transform _rootElementTransform;
+    private Rigidbody _rootElementRigidbody;
+    private Skeleton _skeleton;
     private Transform _target;
     private float _timeElapsed;
 
     private float _walkingSpeed;
+
+    public float despawnRadius = 30.0f;
+    public float despawnTimer = 10.0f;
+    private float _stuckTimer;
 
     void Awake() {
         var mlAgentsConfig = FindObjectOfType<MlAgentConfig>();
@@ -34,6 +41,8 @@ public class BasicCreatureController : MonoBehaviour, ICreatureController
             if (bone.isRoot)
             {
                 _rootElementTransform = bone.transform;
+                _rootElementRigidbody = bone.GetComponent<Rigidbody>();
+                _skeleton = bone.GetComponent<Skeleton>();
                 break;
             }
         }
@@ -45,6 +54,51 @@ public class BasicCreatureController : MonoBehaviour, ICreatureController
     void Update()
     {
         HandleMovementSpeed();
+        HandleDespawn();
+    }
+
+    private void HandleDespawn()
+    {
+        if (_rootElementRigidbody.velocity.magnitude < 0.25f * _movementAgent.MTargetWalkingSpeed)
+        {
+            _stuckTimer += Time.deltaTime;
+        }
+        else
+        {
+            _stuckTimer = 0.0f;
+        }
+
+        if (_stuckTimer >= despawnTimer && Vector3.Distance(_rootElementTransform.position, _target.position) >= despawnRadius)
+        {
+            StartCoroutine(Die());
+        }
+         
+    }
+
+    private IEnumerator Die()
+    {
+       foreach (var (go, _, rb, _) in _skeleton.Iterator())
+       {
+           rb.isKinematic = true;
+           Destroy(go.GetComponent<Collider>());
+       }
+
+       const float sinkSpeed = 0.5f;
+       var distance = 0.0f;
+       // Sink into ground
+       while (distance <= 5.0f)
+       {
+           this.transform.position += Vector3.down * (sinkSpeed * Time.deltaTime);
+           distance += sinkSpeed * Time.deltaTime;
+           yield return null;
+       }
+       
+       // Remove self
+       // NOTE: If we ever start storing references to creatures somewhere, me will want to start keeping a list of gameobjects
+       // to be destroyed and only destroy them at the end of the frame so that
+       // 1. Other gameobjects can finish their update
+       // 2. We can notify other gameobjects that this one has been destroyed
+       Destroy(this.gameObject);
     }
 
     public Vector3 GetNextWayPoint(Vector3 oldWayPoint)
