@@ -59,7 +59,9 @@ public class BasicCreatureController : MonoBehaviour, ICreatureController
 
     private void HandleDespawn()
     {
-        if (_rootElementRigidbody.velocity.magnitude < 0.25f * _movementAgent.MTargetWalkingSpeed)
+        var velocity = _rootElementRigidbody.velocity;
+        velocity.y = 0;
+        if (velocity.magnitude < 0.33f * _movementAgent.MTargetWalkingSpeed)
         {
             _stuckTimer += Time.deltaTime;
         }
