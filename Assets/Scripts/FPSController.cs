@@ -1,8 +1,11 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using DefaultNamespace;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerInputState))]
@@ -34,6 +37,12 @@ public class FPSController : MonoBehaviour
 
     [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
     public float FallTimeout = 0.15f;
+
+    [Tooltip("How often the player can get hit before dying.")]
+    public int Health = 3;
+
+    [Tooltip("How long after a hit until the player can take damage again")]
+    public float PostHitInvincibility = 3.0f;
 
     [Header("Player Grounded")]
     [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
@@ -84,6 +93,10 @@ public class FPSController : MonoBehaviour
     private const float Threshold = 0.01f;
 
     private bool IsCurrentDeviceMouse => _playerInput.currentControlScheme == "KeyboardMouse";
+    
+    // Invincibility
+    private float _invincibilityTimeLeft = 0.0f;
+    private bool _died = false;
 
     private void Awake()
     {
@@ -114,6 +127,8 @@ public class FPSController : MonoBehaviour
         {
             Equip(Inventory[0]);
         }
+
+        GameObject.Find("PlayerCapsule").GetComponent<PlayerCollision>().Controller = this;
     }
 
     private void Update()
@@ -122,11 +137,49 @@ public class FPSController : MonoBehaviour
         GroundedCheck();
         Move();
         UseEquipment();
+        UpdateInvincibility();
+        CheckForDeath();
     }
     
     private void LateUpdate()
     {
         CameraRotation();
+    }
+
+    // Called whenever the player collides with a GameObject with an collider and a bone
+    public void OnDamage()
+    {
+        if (_invincibilityTimeLeft <= float.Epsilon)
+        {
+            _invincibilityTimeLeft = PostHitInvincibility;
+            Health--;
+            Debug.Log("Player Hit");
+        }
+    }
+
+    private void UpdateInvincibility()
+    {
+        _invincibilityTimeLeft = Mathf.Max(0.0f, _invincibilityTimeLeft - Time.deltaTime);
+    }
+
+    private void CheckForDeath()
+    {
+        if (Health <= 0 && !_died)
+        {
+            _died = true;
+            Debug.Log("Game ended");
+
+            StartCoroutine(ShowGameOver());
+        }
+    }
+
+    // TODO: Move this to some kind of scene manager singleton
+    private IEnumerator ShowGameOver()
+    {
+            SceneManager.LoadScene("Scenes/GameOverScreen/GameOverScreen", LoadSceneMode.Additive);
+            yield return null;
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName("GameOverScreen"));
+            SceneManager.UnloadSceneAsync("Scenes/Level");
     }
 
     private void Equip(GameObject equipment)
