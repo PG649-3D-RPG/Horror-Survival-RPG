@@ -4,10 +4,12 @@ using DefaultNamespace;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Gun : MonoBehaviour, IEquipment
+public class BallGun : MonoBehaviour, IEquipment
 {
 
     private Camera _camera;
+
+    public GameObject projectile;
 
     public void OnPrimary()
     {
@@ -16,9 +18,10 @@ public class Gun : MonoBehaviour, IEquipment
 
         if (Physics.Raycast(origin, _camera.transform.forward, out hit, 100.0f))
         {
-            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            sphere.transform.parent = hit.collider.gameObject.transform;
-            sphere.transform.position = hit.point + hit.normal * sphere.GetComponent<SphereCollider>().radius;
+            GameObject ball = Instantiate(projectile);
+            ball.GetComponent<BallGunProjectile>().SetNormal(hit.normal);
+            ball.transform.parent = hit.collider.gameObject.transform;
+            ball.transform.position = hit.point;
         }
     }
 

@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 974641309951749385}
   - component: {fileID: 718417354551942154}
   - component: {fileID: 5874232762277571400}
-  - component: {fileID: 7973518133459572870}
+  - component: {fileID: 6378398456070027038}
   m_Layer: 0
-  m_Name: Gun
+  m_Name: BallGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -101,7 +101,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &7973518133459572870
+--- !u!114 &6378398456070027038
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -113,6 +113,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24c66c55fa1bf54499687c637b0bb856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  projectile: {fileID: 7818721738992220945, guid: 824ae0879c0172242857b17c0b1d557b, type: 3}
 --- !u!1 &5621936145065328258
 GameObject:
   m_ObjectHideFlags: 0
