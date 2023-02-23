@@ -16,13 +16,12 @@ public class BallGun : MonoBehaviour, IEquipment
         var origin = _camera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.0f));
         RaycastHit hit;
 
-        if (Physics.Raycast(origin, _camera.transform.forward, out hit, 100.0f))
-        {
-            GameObject ball = Instantiate(projectile);
-            ball.GetComponent<BallGunProjectile>().SetNormal(hit.normal);
-            ball.transform.parent = hit.collider.gameObject.transform;
-            ball.transform.position = hit.point;
-        }
+        if (!Physics.Raycast(origin, _camera.transform.forward, out hit, 100.0f)) return;
+        if (hit.collider.gameObject.GetComponent<BallGunProjectile>()) return;
+        
+        var ball = Instantiate(projectile, hit.collider.gameObject.transform, true);
+        ball.GetComponent<BallGunProjectile>().SetNormal(hit.normal);
+        ball.transform.position = hit.point;
     }
 
     public void OnEquip()

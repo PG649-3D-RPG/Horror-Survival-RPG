@@ -57,6 +57,11 @@ public class BasicCreatureController : MonoBehaviour, ICreatureController
         HandleDespawn();
     }
 
+    public void Despawn()
+    {
+        StartCoroutine(Die());
+    }
+
     private void HandleDespawn()
     {
         var velocity = _rootElementRigidbody.velocity;

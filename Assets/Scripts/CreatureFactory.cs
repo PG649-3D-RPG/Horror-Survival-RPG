@@ -43,16 +43,23 @@ public class CreatureFactory : MonoBehaviour
         root.transform.position = StoragePosition + index * StorageOffset;
     }
 
+    public int GetNumberOfCreatureTypes()
+    {
+        return Prototypes.Count;
+    }
+
+    public GameObject CreateCreature(int index)
+    {
+        var result = GameObject.Instantiate(Prototypes[index]);
+        var controller = result.AddComponent<BasicCreatureController>();
+        result.GetComponent<AgentNew>()._creatureController = controller;
+        SetKinematic(result, false);
+        return result;
+    }
+
     public Func<GameObject> FactoryFor(int index)
     {
-        return () =>
-        {
-            var result = GameObject.Instantiate(Prototypes[index]);
-            var controller = result.AddComponent<BasicCreatureController>();
-            result.GetComponent<AgentNew>()._creatureController = controller;
-            SetKinematic(result, false);
-            return result;
-        };
+        return () => CreateCreature(index);
     }
 
     private void SetKinematic(GameObject root, bool kinematic)

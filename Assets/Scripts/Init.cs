@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Cinemachine;
 using UnityEngine;
@@ -34,8 +35,9 @@ public class Init : MonoBehaviour
         GameObject dog = GameObject.Instantiate(dogPrefab);
         creatureFactory.AddPrototype(dog);
         yield return null;
-        
-        foreach (var spawnLocation in terrain.GetComponent<MiscTerrainData>().SpawnPoints.Skip(1).Take(20))
+
+        List<SpawnPoint> spawnPoints = new();
+        foreach (var spawnLocation in terrain.GetComponent<MiscTerrainData>().SpawnPoints.Skip(1)) 
         {
             var spawner = new GameObject
             {
@@ -45,8 +47,15 @@ public class Init : MonoBehaviour
                 }
             };
             var spawnPoint = spawner.AddComponent<SpawnPoint>();
-            spawnPoint.Init(creatureFactory.FactoryFor(0), 1.0f, 1);
+            spawnPoint.Init(10.0f);
+            spawnPoints.Add(spawnPoint);
         }
+
+        yield return null;
+
+        var spawnManager = FindObjectOfType<SpawnManager>();
+        spawnManager.Init(spawnPoints, creatureFactory, player);
+        spawnManager.enabled = true;
     }
     private GameObject SetupPlayer(GameObject terrain)
     {
