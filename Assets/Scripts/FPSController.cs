@@ -169,17 +169,8 @@ public class FPSController : MonoBehaviour
             _died = true;
             Debug.Log("Game ended");
 
-            StartCoroutine(ShowGameOver());
+            SceneTransition.ToGameOver();
         }
-    }
-
-    // TODO: Move this to some kind of scene manager singleton
-    private IEnumerator ShowGameOver()
-    {
-            SceneManager.LoadScene("Scenes/GameOverScreen/GameOverScreen", LoadSceneMode.Additive);
-            yield return null;
-            SceneManager.SetActiveScene(SceneManager.GetSceneByName("GameOverScreen"));
-            SceneManager.UnloadSceneAsync("Scenes/Level");
     }
 
     private void Equip(GameObject equipment)
