@@ -336,7 +336,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CGSettings: {fileID: 11400000, guid: 69a11c48616544545a6113d52e23b62a, type: 2}
   BipedSettings: {fileID: 11400000, guid: f41be193d9beb3e44beddade65b99222, type: 2}
-  WGSettings: {fileID: 11400000, guid: 3bcca2de484adb146ac040c09d6250e4, type: 2}
+  WGSettings: {fileID: 11400000, guid: 26b0e5011416d17499617ddebdfa6777, type: 2}
 --- !u!114 &1372991508
 MonoBehaviour:
   m_ObjectHideFlags: 0
