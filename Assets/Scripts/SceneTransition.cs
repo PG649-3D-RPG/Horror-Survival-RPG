@@ -82,10 +82,18 @@ public class SceneTransition : MonoBehaviour
         var creatureFactory = FindObjectOfType<CreatureFactory>();
         //GameObject c1 = CreatureGenerator.ParametricBiped(CGSettings, BipedSettings, null);
         //creatureFactory.AddPrototype(c1);
-        var dogPrefab = Resources.Load("Prefabs/4B_Creature_Dog2V2") as GameObject;
-        GameObject dog = GameObject.Instantiate(dogPrefab);
-        creatureFactory.AddPrototype(dog);
+        //var dogPrefab = Resources.Load("Prefabs/4B_Creature_Dog2V2") as GameObject;
+        //GameObject dog = GameObject.Instantiate(dogPrefab);
+        //creatureFactory.AddPrototype(dog);
+        var quadrupedPrefab = Resources.Load("Prefabs/4B_2PartedLegs") as GameObject;
+        var quadruped = GameObject.Instantiate(quadrupedPrefab); 
+        creatureFactory.AddPrototype(quadruped);
         yield return null;
+        
+        //var bipedPrefab = Resources.Load("Prefabs/DebugCreature_1 shock absorb") as GameObject;
+        //var biped = GameObject.Instantiate(bipedPrefab); 
+        //creatureFactory.AddPrototype(biped);
+        //yield return null;
 
         List<SpawnPoint> spawnPoints = new();
         foreach (var spawnLocation in terrain.GetComponent<MiscTerrainData>().SpawnPoints.Skip(1)) 

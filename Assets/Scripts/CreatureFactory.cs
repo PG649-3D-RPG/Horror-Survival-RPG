@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.MLAgents.Policies;
 using Unity.MLAgentsExamples;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine;
 public class CreatureFactory : MonoBehaviour
 {
 
-    public string AgentScriptName = "AgentNew";
+    public string AgentScriptName = "AgentNavMeshWalking";
     private static readonly Vector3 StoragePosition = new(10000.0f, 0.0f, 0.0f);
     private static readonly Vector3 StorageOffset = new(1000.0f, 0.0f, 0.0f);
 
@@ -24,11 +25,11 @@ public class CreatureFactory : MonoBehaviour
             orientationCube.transform.parent = root.transform;
         } 
         
-        if (root.AddComponent(Type.GetType(AgentScriptName)) == null)
-        {
-            throw new ArgumentException("Agent class name is wrong or does not exist in this context.");
-        }
-
+        //if (root.AddComponent(Type.GetType(AgentScriptName)) == null)
+        //{
+            //throw new ArgumentException("Agent class name is wrong or does not exist in this context.");
+        //}
+        
         // TODO: Figure out if this is actually needed and/or harmful
         if (root.GetComponent<ModelOverrider>() == null)
         {
@@ -52,7 +53,7 @@ public class CreatureFactory : MonoBehaviour
     {
         var result = GameObject.Instantiate(Prototypes[index]);
         var controller = result.AddComponent<BasicCreatureController>();
-        result.GetComponent<AgentNew>()._creatureController = controller;
+        result.GetComponent<AgentNavMeshWalking>()._creatureController = controller;
         SetKinematic(result, false);
         return result;
     }

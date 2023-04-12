@@ -1,21 +1,16 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using Config;
-using JetBrains.Annotations;
 using UnityEngine;
-using Unity.MLAgents;
+using UnityEngine.AI;
 using Unity.MLAgents.Actuators;
-using Unity.MLAgents.Policies;
-using Unity.MLAgentsExamples;
 using Unity.MLAgents.Sensors;
-using Unity.VisualScripting;
+using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering;
 using BodyPart = Unity.MLAgentsExamples.BodyPart;
-using Random = UnityEngine.Random;
 
-public class AgentGenTests : GenericAgent
+public class AgentNavMeshWalking : GenericAgent
 {
+    
     /// <summary>
     /// Add relevant information on each body part to observations.
     /// </summary>
@@ -62,23 +57,13 @@ public class AgentGenTests : GenericAgent
         sensor.AddObservation(Quaternion.FromToRotation(_topTransform.forward, cubeForward));
 
         //Position of target position relative to cube
-        sensor.AddObservation(_orientationCube.transform.InverseTransformPoint(_nextWayPoint));
+        sensor.AddObservation(_orientationCube.transform.InverseTransformPoint(_nextPathPoint));
 
         foreach (var bodyPart in _jdController.bodyPartsList)
         {
             CollectObservationBodyPart(bodyPart, sensor);
             //rotation deltas for the head
             if (bodyPart.rb.transform.GetComponent<Bone>().category == BoneCategory.Head) sensor.AddObservation(Quaternion.FromToRotation(bodyPart.rb.transform.forward, cubeForward));
-        }
-
-        var skeletonScript = _topTransform.GetComponent<Skeleton>();
-        var selfObservations = skeletonScript.SettingsInstance.Observations();
-
-        //Debug.Log(string.Join(", ", selfObservations));
-
-        foreach (var selfOb in selfObservations)
-        {
-            sensor.AddObservation(selfOb);
         }
     }
 
@@ -101,41 +86,38 @@ public class AgentGenTests : GenericAgent
 
     public void FixedUpdate()
     {
-        //Update OrientationCube and DirectionIndicator
-        _nextWayPoint = _creatureController.GetNextWayPoint(_nextWayPoint);
-        _dirToWalk = _nextWayPoint - _topTransform.position;
-        _orientationCube.UpdateOrientation(_topTransform.position, _nextWayPoint);
+        //_nextPathPoint = GetNextPathPoint();
+        if (_creatureController == null) return;
+        _nextPathPoint = _creatureController.GetNextWayPoint(_nextPathPoint);
 
+        //Update OrientationCube and DirectionIndicator
+        var position = _topTransform.position;
+        _orientationCube.UpdateOrientation(position, _nextPathPoint);
         var cubeForward = _orientationCube.transform.forward;
+        var forwardDir = _creatureConfig.creatureType == CreatureType.Biped ? _topTransform.up : _topTransform.forward;
 
         // Set reward for this step according to mixture of the following elements.
         // a. Match target speed
         //This reward will approach 1 if it matches perfectly and approach zero as it deviates
-        var matchSpeedReward = GetMatchingVelocityReward(cubeForward * MTargetWalkingSpeed, GetAvgVelocityOfCreature());
+        var velDeltaMagnitude = Mathf.Clamp(Vector3.Distance(GetAvgVelocityOfCreature(), cubeForward * MTargetWalkingSpeed), 0, MTargetWalkingSpeed);
+        var matchSpeedReward = Mathf.Pow(1 - Mathf.Pow(velDeltaMagnitude / MTargetWalkingSpeed, 2), 2);
 
         // b. Rotation alignment with target direction.
         //This reward will approach 1 if it faces the target direction perfectly and approach zero as it deviates
+        var lookAtTargetReward = (Vector3.Dot(cubeForward, forwardDir) + 1) * 0.5f;
 
-        var cubeForward2d = new Vector2(cubeForward.x, cubeForward.z);
-        var topTranformForward2d = new Vector2(_topTransform.up.x, _topTransform.up.z);
+        if (float.IsNaN(lookAtTargetReward) ||
+            float.IsNaN(matchSpeedReward)) 
+        {
+            Debug.LogError($"Reward contain NaN: lookAtTargetReward {float.IsNaN(lookAtTargetReward)} or matchSpeedReward {float.IsNaN(matchSpeedReward)}");
+        }
+        else
+        {
+            var reward = matchSpeedReward * lookAtTargetReward;
+            //if (Application.isEditor) Debug.Log($"Current reward in episode {_agent.StepCount}: {reward} matchSpeedReward {matchSpeedReward} und lookAtTargetReward {lookAtTargetReward}");
+            AddReward(reward);
+        }
 
-        var lookAtTargetReward = (Vector2.Dot(cubeForward2d, topTranformForward2d) + 1) * 0.5f;
-
-        //Debug.Log(lookAtTargetReward);
-        //Debug.Log("Cube: " + cubeForward2d + " | Creature: " + topTranformForward2d);
-
-        if (float.IsNaN(lookAtTargetReward) || float.IsNaN(matchSpeedReward)) throw new ArgumentException($"A reward is NaN. float.");
-        //Debug.Log($"matchSpeedReward {Math.Max(matchSpeedReward, 0.0f)} lookAtTargetReward {Math.Max(lookAtTargetReward, 0.0f)}");
-        AddReward(Math.Max(matchSpeedReward, 0.0f) * lookAtTargetReward);
-
-        //Debug.Log(GetCumulativeReward());
+        SwitchModel(DetermineModel);
     }
-
-    private float GetMatchingVelocityReward(Vector3 velocityGoal, Vector3 actualVelocity)
-    {
-        //distance between our actual velocity and goal velocity
-        var velDeltaMagnitude = Mathf.Clamp(Vector3.Distance(actualVelocity, velocityGoal), 0, MTargetWalkingSpeed);
-        return Mathf.Pow(1 - Mathf.Pow(velDeltaMagnitude / MTargetWalkingSpeed, 2), 2);
-    }
-
 }

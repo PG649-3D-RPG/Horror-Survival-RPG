@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72dfee221b2e4f3f900e270fbf6e0dfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AgentScriptName: AgentNew
+  AgentScriptName: AgentNavMeshWalking
 --- !u!4 &196126607
 Transform:
   m_ObjectHideFlags: 0
@@ -186,15 +186,15 @@ MonoBehaviour:
   RandomizeWalkSpeedEachEpisode: 0
   MaxWalkingSpeed: 10
   TargetWalkingSpeed: 5
-  ContinuousActionSpace: 61
+  ContinuousActionSpace: 36
   DiscreteBranches: 0
-  MaxStep: 5000
-  ObservationSpace: 318
+  MaxStep: 0
+  ObservationSpace: 198
   TakeActionsBetweenDecisions: 0
   DecisionPeriod: 5
   JointDampen: 5000
-  MaxJointForceLimit: 40000
-  MaxJointSpring: 30000
+  MaxJointForceLimit: 80000
+  MaxJointSpring: 60000
 --- !u!114 &196126609
 MonoBehaviour:
   m_ObjectHideFlags: 0
