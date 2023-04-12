@@ -85,7 +85,7 @@ public class SceneTransition : MonoBehaviour
         //var dogPrefab = Resources.Load("Prefabs/4B_Creature_Dog2V2") as GameObject;
         //GameObject dog = GameObject.Instantiate(dogPrefab);
         //creatureFactory.AddPrototype(dog);
-        var quadrupedPrefab = Resources.Load("Prefabs/4B_2PartedLegs") as GameObject;
+        var quadrupedPrefab = Resources.Load("Prefabs/Creature") as GameObject;
         var quadruped = GameObject.Instantiate(quadrupedPrefab); 
         creatureFactory.AddPrototype(quadruped);
         yield return null;
