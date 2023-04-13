@@ -53,7 +53,8 @@ public class CreatureFactory : MonoBehaviour
     {
         var result = GameObject.Instantiate(Prototypes[index]);
         var controller = result.AddComponent<BasicCreatureController>();
-        result.GetComponent<AgentNavMeshWalking>()._creatureController = controller;
+        if(result.GetComponent<AgentNavMeshWalking>() != null) result.GetComponent<AgentNavMeshWalking>()._creatureController = controller;
+        if(result.GetComponent<AgentNavMeshWalking2B>() != null) result.GetComponent<AgentNavMeshWalking2B>()._creatureController = controller;
         SetKinematic(result, false);
         return result;
     }

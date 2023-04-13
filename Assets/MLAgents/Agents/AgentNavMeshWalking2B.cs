@@ -8,21 +8,22 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using BodyPart = Unity.MLAgentsExamples.BodyPart;
 
-public class AgentNavMeshWalking : GenericAgent
+public class AgentNavMeshWalking2B : GenericAgent
 {
     
     private float topTransformStartRotation;
     private float topTransformStartHeight;
 
-    public void Awake(){
-        this.type = 0;
+
+    public new void Awake(){
+        this.type = 1;
         base.Awake();
     }
 
     public override void Initialize()
     {
         base.Initialize();
-        topTransformStartRotation = this._topTransform.rotation.eulerAngles.z;
+        topTransformStartRotation = this._topTransform.rotation.eulerAngles.x;
         topTransformStartHeight = this._topTransform.position.y;
     }
 
@@ -139,7 +140,7 @@ public class AgentNavMeshWalking : GenericAgent
     int lastModel = 0;
     protected override int DetermineModel()
     {
-        if(_topTransform.position.y < 2*topTransformStartHeight/3 || (Mathf.Abs((_topTransform.rotation.eulerAngles.z % 360) - (topTransformStartRotation % 360)) > 30) ){
+        if(_topTransform.position.y < 2*topTransformStartHeight/3 || (Mathf.Abs((_topTransform.rotation.eulerAngles.x % 360) - (topTransformStartRotation % 360)) > 30) ){
 
             if(lastModel != 1){
                 //Debug.Log($"Switching to Model 1. 1st condition {_topTransform.position.y < topTransformStartHeight/2}, cur {_topTransform.position.y}, init {topTransformStartHeight}, 2nd condition {(Mathf.Abs((_topTransform.rotation.eulerAngles.z % 360) - (topTransformStartRotation % 360)) > 30)}, cur {_topTransform.rotation.eulerAngles.z}, init {topTransformStartRotation}");

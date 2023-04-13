@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.009028179, g: 0.012710864, b: 0.020052295, a: 1}
+  m_IndirectSpecularColor: {r: 0.009028165, g: 0.012710834, b: 0.020052249, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 196126610}
   - component: {fileID: 196126609}
   - component: {fileID: 196126608}
+  - component: {fileID: 196126611}
   m_Layer: 0
   m_Name: CreatureFactory
   m_TagString: Untagged
@@ -239,6 +240,30 @@ MonoBehaviour:
   NavMeshSurfaceCollectObjects: 2
   BakeNavMesh: 0
   NavMeshBuildSettingIndex: 0
+--- !u!114 &196126611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 196126605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3324768aa3a347daba1c965af3dbc12f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RandomizeWalkSpeedEachEpisode: 0
+  MaxWalkingSpeed: 10
+  TargetWalkingSpeed: 5
+  ContinuousActionSpace: 45
+  DiscreteBranches: 0
+  MaxStep: 0
+  ObservationSpace: 263
+  TakeActionsBetweenDecisions: 0
+  DecisionPeriod: 5
+  JointDampen: 5000
+  MaxJointForceLimit: 80000
+  MaxJointSpring: 60000
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

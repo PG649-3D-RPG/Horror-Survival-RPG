@@ -49,6 +49,8 @@ public abstract class GenericAgent : Agent
     public float MTargetWalkingSpeed;
     public const float YHeightOffset = 0.1f;
 
+    protected int type = 0;
+
     public void Awake()
     {
         if(GetComponent<JointDriveController>() != null) Destroy(GetComponent<DecisionRequester>());
@@ -56,7 +58,8 @@ public abstract class GenericAgent : Agent
 
         _decisionRequester = this.AddComponent<DecisionRequester>();
         _jdController = this.AddComponent<JointDriveController>();
-        _mlAgentsConfig = FindObjectOfType<MlAgentConfig>();
+        Debug.Log($"Using mlagents config {type} for creature {this.name}");
+        _mlAgentsConfig = FindObjectsOfType<MlAgentConfig>()[type];
         _arenaSettings = FindObjectOfType<ArenaConfig>();
         _creatureConfig = FindObjectOfType<CreatureConfig>();
         _bpScript = GetComponent<BehaviorParameters>();

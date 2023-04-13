@@ -5,7 +5,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "5198eff1e260b488253ac17166cbccf8b047e8e7"
+      "hash": "c50949d2431c86d5152b31cbc5367af8b0b90e6d"
     },
     "com.pg649.worldgeneration": {
       "version": "https://github.com/PG649-3D-RPG/World-Generation.git?path=/Packages/com.pg649.worldgeneration#main",
@@ -15,7 +15,7 @@
         "com.unity.ai.navigation": "1.0.0-exp.4",
         "com.unity.burst": "1.6.6"
       },
-      "hash": "53f44eb2d9bb44b61d4d7b7b79470d616c27addf"
+      "hash": "6ee8e1c9e0ab5a6a1bf0b87ccf96e9c43817898e"
     },
     "com.unity.ai.navigation": {
       "version": "1.0.0-exp.4",

@@ -1066,7 +1066,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3099382612822641829}
   - component: {fileID: 1214467000695067547}
-  - component: {fileID: 1537092067080162804}
+  - component: {fileID: -2031275610950773734}
   m_Layer: 0
   m_Name: DebugCreature_1 shock absorb
   m_TagString: Untagged
@@ -1104,14 +1104,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 1
+    VectorObservationSize: 263
     NumStackedVectorObservations: 1
     m_ActionSpec:
-      m_NumContinuousActions: 0
-      BranchSizes: 01000000
-    VectorActionSize: 01000000
+      m_NumContinuousActions: 45
+      BranchSizes: 
+    VectorActionSize: 2d000000
     VectorActionDescriptions: []
-    VectorActionSpaceType: 0
+    VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
@@ -1121,7 +1121,7 @@ MonoBehaviour:
   m_UseChildSensors: 1
   m_UseChildActuators: 1
   m_ObservableAttributeHandling: 0
---- !u!114 &1537092067080162804
+--- !u!114 &-2031275610950773734
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1130,7 +1130,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2503996874053077374}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33afc5939178bef4b9dbcf0627f2fbd6, type: 3}
+  m_Script: {fileID: 11500000, guid: 2448c8170438212cc87db867d2cc6fd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   agentParameters:
@@ -1138,8 +1138,8 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   Models:
-  - {fileID: 5022602860645237092, guid: 880ae96b4c587c34f90fefa5bf07cd51, type: 3}
   - {fileID: 5022602860645237092, guid: 8cffc8982c24a1749badbdfd22118646, type: 3}
+  - {fileID: 5022602860645237092, guid: 880ae96b4c587c34f90fefa5bf07cd51, type: 3}
   MTargetWalkingSpeed: 0
 --- !u!1 &3018077186810165556
 GameObject:

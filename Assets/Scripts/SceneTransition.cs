@@ -90,10 +90,10 @@ public class SceneTransition : MonoBehaviour
         creatureFactory.AddPrototype(quadruped);
         yield return null;
         
-        //var bipedPrefab = Resources.Load("Prefabs/DebugCreature_1 shock absorb") as GameObject;
-        //var biped = GameObject.Instantiate(bipedPrefab); 
-        //creatureFactory.AddPrototype(biped);
-        //yield return null;
+        var bipedPrefab = Resources.Load("Prefabs/DebugCreature_1 shock absorb") as GameObject;
+        var biped = GameObject.Instantiate(bipedPrefab); 
+        creatureFactory.AddPrototype(biped);
+        yield return null;
 
         List<SpawnPoint> spawnPoints = new();
         foreach (var spawnLocation in terrain.GetComponent<MiscTerrainData>().SpawnPoints.Skip(1)) 
