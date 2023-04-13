@@ -11,6 +11,16 @@ using BodyPart = Unity.MLAgentsExamples.BodyPart;
 public class AgentNavMeshWalking : GenericAgent
 {
     
+    private float topTransformStartRotation;
+    private float topTransformStartHeight;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        topTransformStartRotation = this._topTransform.rotation.eulerAngles.z;
+        topTransformStartHeight = this._topTransform.position.y;
+    }
+
     /// <summary>
     /// Add relevant information on each body part to observations.
     /// </summary>
@@ -120,4 +130,28 @@ public class AgentNavMeshWalking : GenericAgent
 
         SwitchModel(DetermineModel);
     }
+
+    int lastModel = 0;
+    protected override int DetermineModel()
+    {
+        if(_topTransform.position.y < 2*topTransformStartHeight/3 || (Mathf.Abs((_topTransform.rotation.eulerAngles.z % 360) - (topTransformStartRotation % 360)) > 30) ){
+
+            if(lastModel != 1){
+                //Debug.Log($"Switching to Model 1. 1st condition {_topTransform.position.y < topTransformStartHeight/2}, cur {_topTransform.position.y}, init {topTransformStartHeight}, 2nd condition {(Mathf.Abs((_topTransform.rotation.eulerAngles.z % 360) - (topTransformStartRotation % 360)) > 30)}, cur {_topTransform.rotation.eulerAngles.z}, init {topTransformStartRotation}");
+            }
+
+            lastModel = 1;
+            return 1;
+        }
+        else{
+
+            if(lastModel != 0){
+                //Debug.Log($"Switching to Model 0. 1st condition {_topTransform.position.y < topTransformStartHeight/2}, cur {_topTransform.position.y}, init {topTransformStartHeight}, 2nd condition {(Mathf.Abs((_topTransform.rotation.eulerAngles.z % 360) - (topTransformStartRotation % 360)) > 30)}, cur {_topTransform.rotation.eulerAngles.z}, init {topTransformStartRotation}");
+            }
+
+            lastModel = 0;
+            return 0;
+        }
+    }
+
 }

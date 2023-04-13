@@ -3483,8 +3483,8 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   Models:
-  - {fileID: 5022602860645237092, guid: 8eaa5c1d2a592244dbcaf428c8abe416, type: 3}
   - {fileID: 5022602860645237092, guid: 8259549f66f4b9647847027517812f5e, type: 3}
+  - {fileID: 5022602860645237092, guid: 8eaa5c1d2a592244dbcaf428c8abe416, type: 3}
   MTargetWalkingSpeed: 0
 --- !u!114 &7617292866790405040
 MonoBehaviour:
